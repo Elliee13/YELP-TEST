@@ -354,6 +354,16 @@ img {
   color: var(--space-cadet);
   font-size: 1.5rem;
   box-shadow: var(--ring);
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+
+.wish-button:hover {
+  transform: translateY(-1px);
+}
+
+.wish-button.is-favorite {
+  background: var(--saffron);
+  color: var(--white);
 }
 
 .product-meta,
@@ -371,7 +381,7 @@ img {
   gap: 8px;
 }
 
-.meta-item .star {
+.meta-item > span:first-child {
   color: var(--saffron);
 }
 
@@ -379,6 +389,10 @@ img {
   margin: 0;
   color: var(--rhythm);
   line-height: 1.65;
+}
+
+.product-coordinates {
+  font-size: 0.95rem;
 }
 
 .chip-row,

@@ -1,6 +1,8 @@
 const state = {
   restaurants: [],
-  lastTrigger: null
+  lastTrigger: null,
+  selectedRestaurant: null,
+  favorites: new Set()
 }
 
 const searchForm = document.getElementById('searchForm')
@@ -19,10 +21,20 @@ const detailMeta = document.getElementById('detailMeta')
 const detailTitle = document.getElementById('detailTitle')
 const detailHeroTags = document.getElementById('detailHeroTags')
 const detailDescription = document.getElementById('detailDescription')
+const detailWishButton = document.querySelector('.detail-content .wish-button')
 const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL || 'http://localhost:3001'
 
 searchForm.addEventListener('submit', search)
 closeModalButton.addEventListener('click', closeModal)
+detailWishButton.addEventListener('click', () => {
+  if (!state.selectedRestaurant) {
+    return
+  }
+
+  toggleFavorite(state.selectedRestaurant)
+  setFavoriteButtonState(detailWishButton, state.selectedRestaurant)
+  renderResults()
+})
 
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !detailView.classList.contains('hidden')) {
@@ -78,6 +90,70 @@ function formatDistance(distance) {
   return `${(distance / 1609.34).toFixed(1)} mi away`
 }
 
+function buildRestaurantSummary(restaurant) {
+  const parts = []
+  const categories = formatCategories(restaurant.categories)
+  const city = restaurant.location?.city
+  const reviewCount = restaurant.review_count
+  const distance = formatDistance(restaurant.distance)
+
+  if (categories.length > 0) {
+    parts.push(categories.slice(0, 2).join(', '))
+  }
+
+  if (city) {
+    parts.push(`in ${city}`)
+  }
+
+  if (typeof restaurant.rating === 'number') {
+    let ratingText = `rated ${restaurant.rating.toFixed(1)}`
+
+    if (typeof reviewCount === 'number') {
+      ratingText += ` from ${reviewCount} review${reviewCount === 1 ? '' : 's'}`
+    }
+
+    parts.push(ratingText)
+  }
+
+  if (distance !== 'Not available') {
+    parts.push(distance)
+  }
+
+  if (restaurant.price) {
+    parts.push(`${restaurant.price} price level`)
+  }
+
+  if (parts.length === 0) {
+    return 'Restaurant details available below.'
+  }
+
+  const summary = parts.join(' | ')
+  return summary.charAt(0).toUpperCase() + summary.slice(1) + '.'
+}
+
+function getRestaurantKey(restaurant) {
+  if (restaurant?.id) {
+    return restaurant.id
+  }
+
+  return [restaurant?.name, formatAddress(restaurant?.location)].join('::')
+}
+
+function isFavorite(restaurant) {
+  return state.favorites.has(getRestaurantKey(restaurant))
+}
+
+function toggleFavorite(restaurant) {
+  const key = getRestaurantKey(restaurant)
+
+  if (state.favorites.has(key)) {
+    state.favorites.delete(key)
+    return
+  }
+
+  state.favorites.add(key)
+}
+
 function getOpenState(restaurant) {
   if (typeof restaurant?.is_closed !== 'boolean') {
     return { label: 'Hours unavailable', className: '' }
@@ -107,6 +183,14 @@ function createChip(text, className = 'detail-chip') {
   chip.className = className
   chip.textContent = text
   return chip
+}
+
+function setFavoriteButtonState(button, restaurant) {
+  const favorite = isFavorite(restaurant)
+  button.classList.toggle('is-favorite', favorite)
+  button.setAttribute('aria-pressed', favorite ? 'true' : 'false')
+  button.setAttribute('aria-label', favorite ? 'Remove saved restaurant' : 'Save restaurant')
+  button.innerHTML = favorite ? '&#9829;' : '&#9825;'
 }
 
 function buildMetaItem(icon, text, extraClass = '') {
@@ -153,11 +237,16 @@ function createCard(restaurant) {
   const saveButton = document.createElement('button')
   saveButton.type = 'button'
   saveButton.className = 'wish-button'
-  saveButton.setAttribute('aria-label', 'Save restaurant')
-  saveButton.innerHTML = '&#9825;'
   saveButton.addEventListener('click', event => {
     event.stopPropagation()
+    toggleFavorite(restaurant)
+    setFavoriteButtonState(saveButton, restaurant)
+
+    if (state.selectedRestaurant && getRestaurantKey(state.selectedRestaurant) === getRestaurantKey(restaurant)) {
+      setFavoriteButtonState(detailWishButton, restaurant)
+    }
   })
+  setFavoriteButtonState(saveButton, restaurant)
 
   heading.append(title, saveButton)
 
@@ -172,6 +261,10 @@ function createCard(restaurant) {
   text.className = 'product-text'
   text.textContent = formatAddress(restaurant.location)
 
+  const coordinates = document.createElement('p')
+  coordinates.className = 'product-text product-coordinates'
+  coordinates.textContent = `Coordinates: ${formatCoordinates(restaurant.coordinates)}`
+
   const chips = document.createElement('div')
   chips.className = 'chip-row'
 
@@ -184,7 +277,7 @@ function createCard(restaurant) {
     chips.appendChild(createChip(restaurant.price, 'hero-chip'))
   }
 
-  content.append(heading, meta, text)
+  content.append(heading, meta, text, coordinates)
 
   if (chips.childElementCount > 0) {
     content.appendChild(chips)
@@ -211,6 +304,7 @@ function renderResults() {
 
 function openModal(restaurant, trigger) {
   state.lastTrigger = trigger
+  state.selectedRestaurant = restaurant
 
   detailImage.innerHTML = ''
   detailOpenBadge.textContent = ''
@@ -244,9 +338,8 @@ function openModal(restaurant, trigger) {
     detailHeroTags.appendChild(createChip(restaurant.price))
   }
 
-  detailDescription.textContent = restaurant.is_closed
-    ? 'This restaurant is currently closed, but you can still review its address, contact details, coordinates, and category information before you plan a visit.'
-    : 'This listing is open now and includes the core information people usually scan first: address, categories, phone, pricing, and distance.'
+  detailDescription.textContent = buildRestaurantSummary(restaurant)
+  setFavoriteButtonState(detailWishButton, restaurant)
 
   browseView.classList.add('hidden')
   detailView.classList.remove('hidden')
@@ -257,6 +350,7 @@ function openModal(restaurant, trigger) {
 function closeModal() {
   detailView.classList.add('hidden')
   browseView.classList.remove('hidden')
+  state.selectedRestaurant = null
 
   if (state.lastTrigger instanceof HTMLElement) {
     state.lastTrigger.focus()
