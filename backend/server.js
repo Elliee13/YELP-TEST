@@ -24,8 +24,8 @@ app.get('/api/restaurants', async (req, res) => {
       params: {
         location: city,
         categories: 'restaurants',
-        limit: 20,
-        radius: 8046
+        limit: 10,
+        radius: 8046.72 // 5 miles in meters
       }
     })
 
