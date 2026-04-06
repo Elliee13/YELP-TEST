@@ -46,15 +46,6 @@ img {
   display: block;
 }
 
-button:focus-visible,
-input:focus-visible,
-.product-card:focus-visible,
-.detail-close:focus-visible,
-.wish-button:focus-visible {
-  outline: 3px solid #1b76ff;
-  outline-offset: 4px;
-}
-
 .hidden {
   display: none !important;
 }
@@ -160,6 +151,12 @@ input:focus-visible,
 
 .search-shell input::placeholder {
   color: var(--rhythm);
+}
+
+.search-shell input:focus,
+.search-shell input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .btn {
