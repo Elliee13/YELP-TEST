@@ -20,7 +20,6 @@ const detailOpenBadge = document.getElementById('detailOpenBadge')
 const detailMeta = document.getElementById('detailMeta')
 const detailTitle = document.getElementById('detailTitle')
 const detailHeroTags = document.getElementById('detailHeroTags')
-const detailDescription = document.getElementById('detailDescription')
 const detailWishButton = document.querySelector('.detail-content .wish-button')
 const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL || 'http://localhost:3001'
 
@@ -88,47 +87,6 @@ function formatDistance(distance) {
   }
 
   return `${(distance / 1609.34).toFixed(1)} mi away`
-}
-
-function buildRestaurantSummary(restaurant) {
-  const parts = []
-  const categories = formatCategories(restaurant.categories)
-  const city = restaurant.location?.city
-  const reviewCount = restaurant.review_count
-  const distance = formatDistance(restaurant.distance)
-
-  if (categories.length > 0) {
-    parts.push(categories.slice(0, 2).join(', '))
-  }
-
-  if (city) {
-    parts.push(`in ${city}`)
-  }
-
-  if (typeof restaurant.rating === 'number') {
-    let ratingText = `rated ${restaurant.rating.toFixed(1)}`
-
-    if (typeof reviewCount === 'number') {
-      ratingText += ` from ${reviewCount} review${reviewCount === 1 ? '' : 's'}`
-    }
-
-    parts.push(ratingText)
-  }
-
-  if (distance !== 'Not available') {
-    parts.push(distance)
-  }
-
-  if (restaurant.price) {
-    parts.push(`${restaurant.price} price level`)
-  }
-
-  if (parts.length === 0) {
-    return 'Restaurant details available below.'
-  }
-
-  const summary = parts.join(' | ')
-  return summary.charAt(0).toUpperCase() + summary.slice(1) + '.'
 }
 
 function getRestaurantKey(restaurant) {
@@ -338,7 +296,6 @@ function openModal(restaurant, trigger) {
     detailHeroTags.appendChild(createChip(restaurant.price))
   }
 
-  detailDescription.textContent = buildRestaurantSummary(restaurant)
   setFavoriteButtonState(detailWishButton, restaurant)
 
   browseView.classList.add('hidden')

@@ -503,7 +503,7 @@ img {
 
 .detail-content {
   display: grid;
-  gap: 18px;
+  gap: 12px;
   padding: 28px 0 0;
   color: var(--space-cadet);
 }
@@ -521,13 +521,6 @@ img {
   font-size: clamp(2.1rem, 4vw, 3.2rem);
   line-height: 1.02;
   letter-spacing: -0.05em;
-}
-
-.detail-description {
-  margin: 0;
-  max-width: 64ch;
-  color: var(--rhythm);
-  line-height: 1.7;
 }
 
 .detail-content .wish-button {
@@ -629,7 +622,7 @@ img {
   }
 
   .detail-content {
-    gap: 16px;
+    gap: 12px;
     padding-top: 18px;
   }
 
@@ -649,8 +642,4 @@ img {
     font-size: 0.88rem;
   }
 
-  .detail-description {
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
 }
