@@ -3,35 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <title>Restaurant Finder</title>
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
+  <main id="browseView" class="container">
+    <section class="home">
+      <div class="home-copy">
+        <h1 class="main-heading">Find the best place to eat before you leave the house.</h1>
+        <p class="home-text">
+          Search a city, browse restaurants with stronger visual hierarchy, and open each place into a richer detail view.
+        </p>
 
-  <div class="max-w-2xl mx-auto px-4 py-10">
-    <h1 class="text-3xl font-bold mb-6">Restaurant Finder</h1>
+        <form id="searchForm" class="search-panel">
+          <label class="sr-only" for="cityInput">Search by city</label>
+          <div class="search-shell">
+            <span class="search-icon" aria-hidden="true">&#8981;</span>
+            <input
+              id="cityInput"
+              type="text"
+              placeholder="Search your city here"
+              autocomplete="off"
+            >
+          </div>
+          <button id="searchButton" class="btn btn-primary" type="submit">Search</button>
+        </form>
 
-    <div class="flex gap-3 mb-6">
-      <input
-        id="cityInput"
-        type="text"
-        placeholder="Enter a city..."
-        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-red-400"
-      />
-      <button
-        onclick="search()"
-        class="px-6 py-2 bg-red-500 text-white rounded-lg text-base hover:bg-red-600"
-      >
-        Search
+        <div id="status" class="status hidden" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="product" aria-labelledby="resultsTitle">
+      <div class="section-copy">
+        <p class="section-kicker">Search results</p>
+        <h2 id="resultsTitle" class="section-title">Nearby restaurants</h2>
+        <p class="section-text">Results from Yelp will appear here. Click any card to open a fuller detail view.</p>
+      </div>
+
+      <div id="results" class="products-grid"></div>
+    </section>
+  </main>
+
+  <main id="detailView" class="detail-page hidden">
+    <section
+      class="detail-page-shell"
+      aria-labelledby="detailTitle"
+      tabindex="-1"
+    >
+      <button id="closeModal" class="detail-close" type="button" aria-label="Back to results">
+        Back
       </button>
-    </div>
 
-    <div id="error" class="text-red-500 mb-4"></div>
-    <div id="results"></div>
-  </div>
+      <div class="detail-media">
+        <div id="detailImage" class="detail-image"></div>
+        <div class="detail-floating">
+          <div id="detailOpenBadge" class="detail-badge hidden"></div>
+          <div id="detailHeroTags" class="detail-chip-row"></div>
+        </div>
+      </div>
+
+      <div class="detail-content">
+        <div class="detail-heading">
+          <div>
+            <p class="section-kicker">Restaurant details</p>
+            <h2 id="detailTitle">Restaurant</h2>
+            <div id="detailMeta" class="detail-meta"></div>
+          </div>
+          <button class="wish-button" type="button" aria-label="Save restaurant">&#9825;</button>
+        </div>
+
+        <p id="detailDescription" class="detail-description"></p>
+      </div>
+    </section>
+  </main>
 
   <script src="script.js"></script>
-
 </body>
 </html>

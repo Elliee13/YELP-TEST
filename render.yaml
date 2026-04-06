@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: yelp-restaurant-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: YELP_API_KEY
+        sync: false
+      - key: FRONTEND_ORIGIN
+        sync: false

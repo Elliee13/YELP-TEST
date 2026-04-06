@@ -4,9 +4,10 @@ const axios = require('axios')
 require('dotenv').config()
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN
 
-app.use(cors())
+app.use(cors(FRONTEND_ORIGIN ? { origin: FRONTEND_ORIGIN } : undefined))
 app.use(express.json())
 
 app.get('/api/restaurants', async (req, res) => {
@@ -24,8 +25,8 @@ app.get('/api/restaurants', async (req, res) => {
       params: {
         location: city,
         categories: 'restaurants',
-        limit: 10,
-        radius: 8046.72 // 5 miles in meters
+        limit: 10, // 10 results for better performance
+        radius: 8046 // 5 miles in meters
       }
     })
 
@@ -35,6 +36,7 @@ app.get('/api/restaurants', async (req, res) => {
     if (error.response?.status === 400) {
       return res.status(404).json({ error: 'City not found. Please try another city.' })
     }
+
     res.status(500).json({ error: 'Something went wrong. Please try again.' })
   }
 })
