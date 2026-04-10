@@ -8,14 +8,15 @@ The app has two parts:
 - `backend/`: Express API that proxies Yelp requests
 
 The frontend searches by city, shows restaurant cards, and opens a minimal detail page for each result.
+Favorites are client-side only and reset on refresh.
 
 ## Features
 
 - Search restaurants by city
 - Yelp-backed results through a local backend route
 - Minimal responsive frontend
-- Result cards with open/closed state, rating, address, and categories
-- Detail page with restaurant image, metadata, and description
+- Result cards with open/closed state, rating, address, coordinates, and categories
+- Detail page with restaurant image, metadata, and favorite toggle
 - Smooth scroll to results after search
 
 ## Project Structure
@@ -102,7 +103,7 @@ The frontend reads its backend base URL from:
 
 - [`frontend/config.js`](./frontend/config.js)
 
-Current local default:
+Example local config:
 
 ```js
 window.APP_CONFIG = {
@@ -110,7 +111,15 @@ window.APP_CONFIG = {
 }
 ```
 
-Before deploying the frontend, update `API_BASE_URL` to your Render backend URL.
+Current checked-in production config:
+
+```js
+window.APP_CONFIG = {
+  API_BASE_URL: 'https://yelp-test.onrender.com'
+}
+```
+
+Before deploying a different frontend or running locally against a local backend, update `API_BASE_URL` to the correct backend URL.
 
 Example:
 
@@ -176,8 +185,8 @@ Before deploying:
 ## Current Production Checklist
 
 - Add a valid Yelp API key in Render
-- Set `FRONTEND_ORIGIN` in Render to the Vercel domain
-- Update `frontend/config.js` to the Render backend URL
+- Set `FRONTEND_ORIGIN` in Render to the Vercel domain with no trailing slash
+- Confirm `frontend/config.js` points to the correct Render backend URL
 - Deploy `backend/` to Render
 - Deploy `frontend/` to Vercel
 
@@ -192,6 +201,7 @@ Before deploying:
 - The backend uses a fixed radius of `8046` meters, which is about 5 miles
 - No database is used
 - No frontend framework is used
+- Favorites are stored only in frontend memory and are not persisted
 
 ## License
 
